@@ -10,19 +10,33 @@ output:
 ```{r, echo = TRUE}
 unzip("activity.zip")
 activity <- read.csv("activity.csv", header=TRUE, sep=",")
-activity <- activity[which(!is.na(activity$steps)),] ## remove missing value
+activity$steps <- ifelse(is.na(activity$steps), 0, activity$steps) #replace NA with 0 in "steps" column
 summary(activity)
 ```
 
 
-## What is mean total number of steps taken per day?
+## What is mean total number of steps taken per day?\  
+1. Make a histogram of the total number of steps taken each day
 ```{r, echo=TRUE}
 steps.perdate <- aggregate(steps ~ date, data=activity, FUN=sum)
+hist(steps.perdate$steps, xlab="Steps per day", ylim=c(0,30),
+     main="Histogram of total steps per day")
+```
+  
+2. Calculate and report the mean and median of the total number of steps taken per day
+```{r, echo=TRUE}
+mean(steps.perdate$steps)
+median(steps.perdate$steps)
 ```
 
 
-## What is the average daily activity pattern?
-
+## What is the average daily activity pattern?  
+1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+```{r, echo=TRUE}
+steps.interval <- aggregate(steps ~ interval, data = activity, FUN=mean)
+plot(steps ~ interval, data=steps.interval, type="l", 
+     xlab="Interval in 5 mins", ylab="Average steps")
+```
 
 
 ## Imputing missing values
