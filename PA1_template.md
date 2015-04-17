@@ -1,5 +1,38 @@
 # Reproducible Research: Peer Assessment 1
+## Load required packages
 
+```r
+require(dplyr)
+```
+
+```
+## Loading required package: dplyr
+```
+
+```
+## Warning: package 'dplyr' was built under R version 3.1.2
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
+require(lattice)
+```
+
+```
+## Loading required package: lattice
+```
 
 ## Loading and preprocessing the data
 
@@ -30,7 +63,7 @@ hist(steps.perdate$steps, xlab="Steps per day", ylim=c(0,30),
      main="Histogram of total steps per day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
   
 2. Calculate and report the mean and median of the total number of steps taken per day
 
@@ -60,7 +93,7 @@ plot(steps ~ interval, data=steps.interval, type="l",
      xlab="Interval in 5 mins", ylab="Average steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -108,7 +141,7 @@ summary(merge.data)
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
 ```r
-activity <- merge.data[, c(2,3,1)]
+activity <- arrange(merge.data[, c(2,3,1)], date, interval)
 summary(activity)
 ```
 
@@ -131,7 +164,7 @@ hist(steps.eachday$steps, xlab="Steps each day", ylim=c(0,40),
      main="Histogram of total steps each day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
 
 ```r
 mean(steps.eachday$steps)
@@ -154,7 +187,29 @@ The median value is a little different because more values instead of NAs are in
 ## Are there differences in activity patterns between weekdays and weekends?  
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 
+```r
+activity$day <- as.factor(ifelse(weekdays(as.Date(activity$date)) %in% c("Saturday","Sunday","星期六","星期日"),
+                                 "weekend", "weekday"))
+summary(activity)
+```
 
-2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+```
+##      steps                date          interval           day       
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0   weekday:12960  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8   weekend: 4608  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5                  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5                  
+##  3rd Qu.: 27.00   2012-10-05:  288   3rd Qu.:1766.2                  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0                  
+##                   (Other)   :15840
+```
 
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
+
+```r
+steps.daytype <- aggregate(steps ~ interval+day, data=activity, FUN=mean)
+xyplot(steps ~ interval|day, data=steps.daytype, type="l", layout=c(1,2), xlab="Interval in 5 mins", ylab="Average steps")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
 

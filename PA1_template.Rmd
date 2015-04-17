@@ -4,7 +4,11 @@ output:
   html_document:
     keep_md: true
 ---
-
+## Load required packages
+```{r, echo=TRUE, results='hide'}
+require(dplyr)
+require(lattice)
+```
 
 ## Loading and preprocessing the data
 ```{r, echo = TRUE}
@@ -59,7 +63,6 @@ summary(merge.data)
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 ```{r, echo=TRUE}
-require(dplyr)
 activity <- arrange(merge.data[, c(2,3,1)], date, interval)
 summary(activity)
 ```
@@ -78,11 +81,14 @@ The median value is a little different because more values instead of NAs are in
 ## Are there differences in activity patterns between weekdays and weekends?  
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 ```{r, echo=TRUE}
-
+activity$day <- as.factor(ifelse(weekdays(as.Date(activity$date)) %in% c("Saturday","Sunday","星期六","星期日"),
+                                 "weekend", "weekday"))
+summary(activity)
 ```
 
-2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
 ```{r, echo=TRUE}
-
+steps.daytype <- aggregate(steps ~ interval+day, data=activity, FUN=mean)
+xyplot(steps ~ interval|day, data=steps.daytype, type="l", layout=c(1,2), xlab="Interval in 5 mins", ylab="Average steps")
 ```
 
